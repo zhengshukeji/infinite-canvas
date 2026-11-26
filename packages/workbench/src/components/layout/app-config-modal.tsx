@@ -9,6 +9,7 @@ import { applicationBinding, pluginRegistry } from "@workbench/lib/plugins/regis
 import { usePluginStore } from "@workbench/stores/use-plugin-store";
 import { workbenchMessageOptions } from "@workbench/components/ui/sonner";
 import { network } from "@workbench/services/network/runtime";
+import { storage } from "@workbench/services/storage/runtime";
 import { exportAppConfig, importAppConfig } from "@workbench/services/config-file";
 import { workspaceConfigWrites } from "@workbench/stores/use-workspace-config-store";
 import { getModelConfigIssue, modelOptionLabel, useConfigStore, channelWrites } from "@workbench/stores/use-config-store";
@@ -27,7 +28,7 @@ import styles from "./app-config-modal.module.css";
 type SettingsTab = { id: string; title: string; icon: ReactNode; page?: boolean; hidden?: boolean; Content: (props: { signal: AbortSignal }) => ReactNode };
 const allTabs: SettingsTab[] = [
     { id: "builtin:channels", title: "渠道", icon: <SlidersHorizontal className="size-[18px]" />, page: true, Content: ConfigChannels },
-    { id: "builtin:external-agent", title: "Agent配置", icon: <Bot className="size-[18px]" />, Content: ConfigExternalAgent },
+    { id: "builtin:external-agent", title: "Agent配置", icon: <Bot className="size-[18px]" />, hidden: storage.kind !== "server", Content: ConfigExternalAgent },
     { id: "builtin:plugins", title: "插件", icon: <Puzzle className="size-[18px]" />, page: true, Content: ConfigPlugins },
     { id: "builtin:appearance", title: "外观", icon: <Palette className="size-[18px]" />, Content: ConfigAppearance },
     { id: "builtin:local-proxy", title: "本地代理", icon: <Network className="size-[18px]" />, hidden: network.kind !== "browser", Content: ConfigLocalProxy },

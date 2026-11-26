@@ -9,6 +9,7 @@ import { AgentChat } from "./agent-chat";
 import { AgentHistoryView } from "./agent-history-view";
 import { ConfigExternalAgent } from "@workbench/components/layout/config-external-agent";
 import { AgentPanelTabs } from "./agent-panel-tabs";
+import { storage } from "@workbench/services/storage/runtime";
 import { useAgentChatStore } from "@workbench/stores/use-agent-chat-store";
 import { canvasThemes } from "@workbench/lib/canvas-theme";
 import { CANVAS_AGENT_PANEL_MOTION_MS, useAgentStore } from "@workbench/stores/use-agent-store";
@@ -19,7 +20,8 @@ const PANEL_MOTION_SECONDS = CANVAS_AGENT_PANEL_MOTION_MS / 1000;
 
 export function AgentPanel() {
     const projectId = useMatch("/canvas/:id")?.params.id;
-    const activeTab = useAgentStore((state) => state.activeTab);
+    const showMcp = storage.kind === "server";
+    const activeTab = useAgentStore((state) => !showMcp && state.activeTab === "mcp" ? "chat" : state.activeTab);
     const busy = useAgentStore((state) => Boolean(state.runningThreadId));
     const historyReady = useAgentChatStore((state) => state.ready && !state.storageError);
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
@@ -69,7 +71,11 @@ export function AgentPanel() {
                 style={{ width, background: theme.node.panel, borderColor: theme.node.stroke, color: theme.node.text }}
             >
                 <button type="button" className="absolute inset-y-0 left-0 z-40 w-4 -translate-x-1/2 cursor-col-resize" onPointerDown={startResize} aria-label="调整右侧面板宽度" />
-                <AgentPanelTabs value={activeTab} theme={theme} items={[{ value: "chat", label: "聊天", icon: <MessageSquare className="size-4" /> }, { value: "history", label: "历史", icon: <History className="size-4" /> }, { value: "mcp", label: "MCP", icon: <Plug className="size-4" /> }]} onChange={(activeTab) => setAgentState({ activeTab })}
+                <AgentPanelTabs value={activeTab} theme={theme} items={[
+                    { value: "chat", label: "聊天", icon: <MessageSquare className="size-4" /> },
+                    { value: "history", label: "历史", icon: <History className="size-4" /> },
+                    ...(showMcp ? [{ value: "mcp" as const, label: "MCP", icon: <Plug className="size-4" /> }] : []),
+                ]} onChange={(activeTab) => setAgentState({ activeTab })}
                     right={<>
                         <PanelHeaderAction label="新对话" disabled={busy || !historyReady} onClick={() => { useAgentChatStore.getState().createThread(projectId); setAgentState({ activeTab: "chat" }); }}><Plus className="size-4" /></PanelHeaderAction>
                         <PanelHeaderAction label="收起面板" onClick={() => useAgentStore.getState().closePanel()}><PanelRightClose className="size-4" /></PanelHeaderAction>
