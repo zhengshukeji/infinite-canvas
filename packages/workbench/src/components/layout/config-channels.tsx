@@ -1,10 +1,9 @@
 import { Button } from "@infinite-canvas/plugin-sdk/ui/button";
 import { Input } from "@infinite-canvas/plugin-sdk/ui/input";
-import { ExternalLink, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@infinite-canvas/plugin-sdk/ui/select";
 import { toast } from "sonner";
 import type { ModelChannel } from "@infinite-canvas/shared/channels";
-import { channelSponsors, type ChannelSponsor } from "@workbench/constant/channel-sponsors";
 import { createModelChannel, createModelGroup, normalizeChannelModels, updateChannels, useConfigStore } from "@workbench/stores/use-config-store";
 import { workbenchMessageOptions } from "@workbench/components/ui/sonner";
 import { ChannelEditorPanel } from "./channel-editor-panel";
@@ -18,7 +17,7 @@ export function ConfigChannels({ signal }: { signal: AbortSignal }) {
     const channels = config.channels;
     const selectedChannel = channels.find((channel) => channel.id === requestedSelection.channelId) ?? channels[0];
     const groupId = selectedChannel?.groups.find((group) => group.id === requestedSelection.groupId)?.id ?? selectedChannel?.groups[0]?.id;
-    // 只有当前渠道真正有了模型才切到分组与模型列表；名称、地址、密钥的变化都留在赞助商视图。
+    // 只有当前渠道真正有了模型才切到分组与模型列表；名称、地址、密钥的变化都留在新建渠道视图。
     const newChannel = Boolean(selectedChannel && !selectedChannel.groups.some((group) => group.models.length));
     const saveChannels = (next: ModelChannel[]) => {
         if (signal.aborted) return;
@@ -34,12 +33,6 @@ export function ConfigChannels({ signal }: { signal: AbortSignal }) {
         const channel = createModelChannel({ name: `渠道 ${channels.length + 1}` });
         saveChannels([...channels, channel]);
         useConfigStore.setState({ configSelection: { tab: "builtin:channels", channelId: channel.id, groupId: channel.groups[0]?.id } });
-    };
-    const applySponsor = (sponsor: ChannelSponsor) => {
-        if (!selectedChannel) return;
-        const current = useConfigStore.getState().config.channels.find((channel) => channel.id === selectedChannel.id) ?? selectedChannel;
-        updateChannel({ ...current, name: sponsor.name, baseUrl: sponsor.baseUrl });
-        toast.success(`当前已切换到「${sponsor.name}」赞助商渠道`, { ...workbenchMessageOptions.success, id: "channel-sponsor" });
     };
     const addGroup = (channel: ModelChannel) => {
         const group = createModelGroup({ name: `分组 ${channel.groups.length + 1}` });
@@ -114,8 +107,7 @@ export function ConfigChannels({ signal }: { signal: AbortSignal }) {
                         </div>
                     </div> : null}
                     <div className="min-h-0 min-w-0 flex-1">
-                        {selectedChannel ? <ChannelEditorPanel key={`${selectedChannel.id}:${groupId ?? ""}`} channel={selectedChannel} groupId={groupId} onChange={updateChannel} newChannel={newChannel}
-                            sponsors={newChannel ? <ChannelSponsorPicker onPick={applySponsor} /> : undefined} /> : <div className="flex h-full flex-col">
+                        {selectedChannel ? <ChannelEditorPanel key={`${selectedChannel.id}:${groupId ?? ""}`} channel={selectedChannel} groupId={groupId} onChange={updateChannel} newChannel={newChannel} /> : <div className="flex h-full flex-col">
                             <h2 className="m-0 flex h-14 shrink-0 items-center border-b border-(--channel-line) px-4 text-sm font-semibold">模型</h2>
                             <div className="flex flex-1 items-center justify-center px-6 text-sm text-muted-foreground">选择渠道和分组，管理模型及调用方式。</div>
                         </div>}
@@ -124,43 +116,6 @@ export function ConfigChannels({ signal }: { signal: AbortSignal }) {
             </div>
         </div>
     </div>;
-}
-
-function ChannelSponsorPicker({ onPick }: { onPick: (sponsor: ChannelSponsor) => void }) {
-    return <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex min-w-0 shrink-0 items-center justify-between gap-4">
-            <h2 className="m-0 shrink-0 text-sm font-semibold">赞助商渠道</h2>
-            <p className="m-0 min-w-0 truncate text-right text-xs text-(--channel-secondary)">选择后自动填写渠道名称和服务地址；也可在上方手动填写地址，填写 API Key 后拉取模型列表。</p>
-        </div>
-        <div className="thin-scrollbar mt-4 grid min-h-0 flex-1 content-start gap-3 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2">
-            {channelSponsors.map((sponsor) => {
-                return <div key={sponsor.id} className="flex min-w-0 items-center rounded-xl border border-(--channel-line) transition-colors hover:bg-(--settings-hover)">
-                    <button type="button" onClick={() => onPick(sponsor)} className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left">
-                        <span className="flex h-10 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg px-2 dark:bg-stone-200"><img src={sponsor.logo} alt="" fetchPriority="high" className="h-7 max-w-full object-contain" /></span>
-                        <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-semibold">{sponsor.name}</span>
-                            <span className="mt-0.5 block truncate text-xs text-(--channel-secondary)">{sponsorHost(sponsor.baseUrl)} · {sponsor.description}</span>
-                        </span>
-                    </button>
-                    <div className="mr-3 flex shrink-0 items-center gap-2">
-                        <Button type="button" variant="outline" size="xs" aria-label={`打开 ${sponsor.name} 官网`} title={`打开 ${sponsor.name} 官网`}
-                            onClick={() => window.open(sponsor.website, "_blank", "noopener,noreferrer")}>
-                            <ExternalLink aria-hidden className="size-3" />官网
-                        </Button>
-                        <Button type="button" size="xs" onClick={() => onPick(sponsor)}>使用</Button>
-                    </div>
-                </div>;
-            })}
-        </div>
-    </div>;
-}
-
-function sponsorHost(baseUrl: string) {
-    try {
-        return new URL(baseUrl).host;
-    } catch {
-        return baseUrl;
-    }
 }
 
 function RemoveNavigationItem({ title, label, question, compact, onConfirm }: { title: string; label: string; question: string; compact?: boolean; onConfirm: () => void }) {

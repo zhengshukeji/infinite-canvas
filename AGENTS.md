@@ -30,7 +30,7 @@
 - 前端使用 Vite、React、React Router、TypeScript、Tailwind CSS 和 Zustand。
 - 工作台和插件共用 SDK 的 shadcn/ui 控件，按需从 `@infinite-canvas/plugin-sdk/ui/<组件名>` 导入。菜单、弹窗等需要直接组合底层交互时，沿用项目现有的 `radix-ui` 用法。
 - 图片、视频、音频和普通文本生成通过 ModelAdapter，渠道保存与模型列表通过 ChannelAdapter；两个启动入口分别注入浏览器或 HTTP 实现。共用脚本执行和内置调用脚本放在 `packages/model-runtime/`（内置调用脚本在 `packages/model-runtime/src/call-scripts/`），本地模型服务放在 `packages/server/src/models/`。业务存储统一通过 StorageAdapter，不在业务模块直接绑定 IndexedDB 或磁盘。
-- 渠道设置的新建渠道视图只按当前渠道是否已有模型判断：没有模型时始终展示赞助商卡片和拉取入口，修改渠道名称、服务地址、API Key 或列表格式都不能切换布局或隐藏赞助商；只有实际拉取或手动添加模型后才显示分组和模型列表。
+- 渠道设置的新建渠道视图只按当前渠道是否已有模型判断：没有模型时展示拉取入口；修改渠道名称、服务地址、API Key 或列表格式不切换布局，实际拉取或添加模型后才显示分组和模型列表。
 - 浏览器专用的本地代理设置只在纯 Web 展示；CLI/Desktop 自动使用自身服务，不读取该代理开关或要求另启代理。WebDAV、远程素材和资源下载通过 NetworkAdapter 选择请求路径，不能只隐藏入口却保留浏览器跨域请求；界面仅对确实不同的设置项按运行环境展示，不新增通用功能装配框架。
 - WebDAV 与对象存储配置通过 WorkspaceConfigAdapter 和独立 store 保存，纯 Web 使用 localforage，本地模式使用工作区私有配置；浏览器偏好不重复持久化这些字段。使用、导入和导出配置前等待保存回执，本地模型执行直接读取工作区配置。
 - 存储统计与内容浏览通过 StorageInspectionAdapter，页面使用业务分类，不绑定表名或磁盘路径；本地模式区分工作区文件大小与所在磁盘空间，私有配置只汇总占用，缺少图片预览时不自动读取原图。

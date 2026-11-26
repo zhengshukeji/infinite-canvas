@@ -7,7 +7,7 @@ import { Button as SettingsButton } from "@infinite-canvas/plugin-sdk/ui/button"
 import { Input as SettingsInput } from "@infinite-canvas/plugin-sdk/ui/input";
 import { ChevronRight, CircleAlert, CircleX, CodeXml, LoaderCircle, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@infinite-canvas/plugin-sdk/ui/select";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ModelIcon } from "@workbench/components/model-icon";
@@ -24,7 +24,7 @@ import { ChannelSegments } from "./channel-segments";
 import { SettingsPasswordInput } from "./settings-network-controls";
 import styles from "./app-config-modal.module.css";
 
-export function ChannelEditorPanel({ channel, groupId, onChange, newChannel, sponsors }: { channel: ModelChannel; groupId?: string; onChange: (channel: ModelChannel) => void; newChannel?: boolean; sponsors?: ReactNode }) {
+export function ChannelEditorPanel({ channel, groupId, onChange, newChannel }: { channel: ModelChannel; groupId?: string; onChange: (channel: ModelChannel) => void; newChannel?: boolean }) {
     usePluginStore((state) => state.revision);
     const savedScripts = useCallScriptStore((state) => state.scripts);
     const removedBuiltinIds = useCallScriptStore((state) => state.removedBuiltinIds);
@@ -150,7 +150,6 @@ export function ChannelEditorPanel({ channel, groupId, onChange, newChannel, spo
                             {formatControl}
                             {fetchControl}
                         </div>
-                        {sponsors}
                     </div>
                 ) : group ? (
                     <div className="channel-models settings-network generation-workspace-controls flex min-h-0 flex-1 flex-col gap-4 max-lg:flex-none">
