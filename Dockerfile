@@ -12,6 +12,7 @@ RUN pnpm --filter @infinite-canvas/web build
 FROM nginx:1.27-alpine
 
 COPY --from=web-build /app/apps/web/dist /usr/share/nginx/html
+COPY LICENSE /usr/share/nginx/html/LICENSE
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY apps/web/docker-entrypoint.sh /docker-entrypoint.d/40-runtime-config.sh
 RUN chmod +x /docker-entrypoint.d/40-runtime-config.sh

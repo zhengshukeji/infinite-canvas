@@ -12,7 +12,7 @@ Docker 镜像只包含纯 Web 版：nginx 托管静态页面，数据保存在�
 ## 使用发布镜像
 
 ```bash
-git clone git@github.com:basketikun/infinite-canvas.git
+git clone https://github.com/zhengshukeji/infinite-canvas.git
 cd infinite-canvas
 docker compose up -d
 ```
@@ -22,6 +22,12 @@ docker compose up -d
 ```text
 http://localhost:3000
 ```
+
+## 发布应用镜像
+
+在 GitHub 仓库的 Actions secrets 中配置 `DOCKERHUB_TOKEN`，使用 `zhengshuyun` 账号有写权限的 Docker Hub 访问令牌。在默认分支手动运行「Docker image」，会发布 `zhengshuyun/infinite-canvas:latest` 和对应的提交标签。推送 `v*` 标签也会发布版本标签。镜像包含 `linux/amd64` 和 `linux/arm64`。
+
+整数云镜像的版本标签使用 `v1.0.0-zsy.1` 这类格式，应用仍使用上游的版本号。
 
 ## 本地构建镜像
 
@@ -69,7 +75,7 @@ docker compose -f docker-compose.local.yml up -d --build
 ```yaml
 services:
   app:
-    image: ghcr.io/basketikun/infinite-canvas:latest
+    image: zhengshuyun/infinite-canvas:latest
     ports:
       - "3000:3000"
     environment:
@@ -83,7 +89,7 @@ services:
 docker run -d -p 3000:3000 \
   -e ANALYTICS_GA4_ID=G-XXXXXXXXXX \
   -e ANALYTICS_BAIDU_ID=e8263761cc5c32f5f7a855b8203b965a \
-  ghcr.io/basketikun/infinite-canvas:latest
+  zhengshuyun/infinite-canvas:latest
 ```
 
 单页应用的路由切换会自动向所有已启用的统计上报 pageview。

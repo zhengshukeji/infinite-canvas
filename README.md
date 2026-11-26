@@ -177,7 +177,7 @@ pnpm build:desktop
 ### Docker 运行（纯 Web 版）
 
 ```bash
-git clone git@github.com:basketikun/infinite-canvas.git
+git clone https://github.com/zhengshukeji/infinite-canvas.git
 cd infinite-canvas
 docker compose up -d
 ```
