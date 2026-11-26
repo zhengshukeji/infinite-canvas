@@ -53,6 +53,7 @@ export type AiConfig = {
 export const CONFIG_STORE_KEY = "infinite-canvas-v1:ai_config_store";
 const GROUP_MODEL_SEPARATOR = "::";
 const OPENAI_BASE_URL = "https://api.openai.com";
+export const defaultChannelPreset = { name: "整数云", baseUrl: "https://zhengshuyun.com/v1" };
 export const LOCAL_PROXY_PACKAGE = "@basketikun/canvas-proxy";
 export const DEFAULT_LOCAL_PROXY_URL = "http://127.0.0.1:23210";
 
@@ -60,7 +61,7 @@ export const defaultConfig: AiConfig = {
     channelMode: "local",
     baseUrl: OPENAI_BASE_URL,
     apiKey: "",
-    channels: [{ id: "default", name: "默认渠道", baseUrl: "", groups: [] }],
+    channels: [{ id: "default", ...defaultChannelPreset, groups: [] }],
     model: "",
     imageModel: "",
     videoModel: "",

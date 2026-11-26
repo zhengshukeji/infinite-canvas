@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@infinite-canvas/plugin-sdk/ui/select";
 import { toast } from "sonner";
 import type { ModelChannel } from "@infinite-canvas/shared/channels";
-import { createModelChannel, createModelGroup, normalizeChannelModels, updateChannels, useConfigStore } from "@workbench/stores/use-config-store";
+import { createModelChannel, createModelGroup, defaultChannelPreset, normalizeChannelModels, updateChannels, useConfigStore } from "@workbench/stores/use-config-store";
 import { workbenchMessageOptions } from "@workbench/components/ui/sonner";
 import { ChannelEditorPanel } from "./channel-editor-panel";
 import { ChannelRemoveConfirmation } from "./channel-remove-confirmation";
@@ -30,7 +30,7 @@ export function ConfigChannels({ signal }: { signal: AbortSignal }) {
         saveChannels(useConfigStore.getState().config.channels.map((item) => item.id === channel.id ? next : item));
     };
     const addChannel = () => {
-        const channel = createModelChannel({ name: `渠道 ${channels.length + 1}` });
+        const channel = createModelChannel(defaultChannelPreset);
         saveChannels([...channels, channel]);
         useConfigStore.setState({ configSelection: { tab: "builtin:channels", channelId: channel.id, groupId: channel.groups[0]?.id } });
     };

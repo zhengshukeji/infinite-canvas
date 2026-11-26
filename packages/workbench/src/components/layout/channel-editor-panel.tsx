@@ -121,10 +121,15 @@ export function ChannelEditorPanel({ channel, groupId, onChange, newChannel }: {
         <div className="flex h-6 items-center">
             <label htmlFor={keyInputId} className="text-xs font-medium">API Key</label>
         </div>
-        <SettingsPasswordInput id={keyInputId} label="密钥" value={keyDraft ?? group?.apiKey ?? ""} onChange={(event) => setKeyDraft(event.target.value)} onBlur={() => {
-            if (keyDraft !== undefined && keyDraft !== (group?.apiKey ?? "")) patchGroup({ apiKey: keyDraft, hasApiKey: Boolean(keyDraft) });
-            setKeyDraft(undefined);
-        }} placeholder={group?.hasApiKey ? "已保存，输入新密钥可替换" : "填写此分组的密钥"} />
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <SettingsPasswordInput id={keyInputId} label="密钥" value={keyDraft ?? group?.apiKey ?? ""} onChange={(event) => setKeyDraft(event.target.value)} onBlur={() => {
+                if (keyDraft !== undefined && keyDraft !== (group?.apiKey ?? "")) patchGroup({ apiKey: keyDraft, hasApiKey: Boolean(keyDraft) });
+                setKeyDraft(undefined);
+            }} placeholder={group?.hasApiKey ? "已保存，输入新密钥可替换" : "填写此分组的密钥"} />
+            <SettingsButton asChild variant="outline" size="sm">
+                <a href="https://zhengshuyun.com/console/api-keys" target="_blank" rel="noopener noreferrer" title="打开整数云 API 密钥页面">获取 API Key</a>
+            </SettingsButton>
+        </div>
     </div>;
     const formatControl = <div className="flex shrink-0 items-center gap-2">
         <span className="whitespace-nowrap text-(--channel-secondary)">列表格式</span>
